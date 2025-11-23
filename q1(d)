@@ -1,0 +1,61 @@
+#include <iostream>
+#include <climits>
+using namespace std;
+void dijkstra(int **wt, int n, int src) {
+    const int INF = INT_MAX/4;
+    int *dist = new int[n];
+    bool *visited = new bool[n];
+    for (int i=0;i<n;++i) {
+        dist[i] = INF;
+        visited[i] = false;
+    }
+    dist[src] = 0;
+    for (int i=0;i<n;++i) {
+        int u = -1;
+        int best = INF;
+        for (int v=0; v<n; ++v) {
+            if (!visited[v] && dist[v] < best) {
+                best = dist[v];
+                u = v;
+            }
+        }
+        if (u == -1) break;
+        visited[u] = true;
+
+        for (int v=0; v<n; ++v) {
+            if (wt[u][v] >= 0 && !visited[v]) {
+                if (dist[u] + wt[u][v] < dist[v]) {
+                    dist[v] = dist[u] + wt[u][v];
+                }
+            }
+        }
+    }
+    cout << "Distances from " << src << ":\n";
+    for (int i=0;i<n;++i) {
+        if (dist[i] >= INF/2) cout << i << ": INF\n";
+        else cout << i << ": " << dist[i] << '\n';
+    }
+    delete[] dist; delete[] visited;
+}
+int main() {
+    int n;
+    cout << "Enter number of vertices: ";
+    if (!(cin >> n) || n <= 0) return 0;
+    int **wt = new int*[n];
+    for (int i=0;i<n;++i) {
+        wt[i] = new int[n];
+        for (int j=0;j<n;++j) wt[i][j] = -1;
+    }
+    cout << "Enter adjacency weight matrix (n x n). Use -1 for no edge. Diagonal should be 0.\n";
+    for (int i=0;i<n;++i)
+        for (int j=0;j<n;++j)
+            cin >> wt[i][j];
+    int src;
+    cout << "Enter source vertex (0-based): ";
+    cin >> src;
+    if (src < 0 || src >= n) src = 0;
+    dijkstra(wt, n, src);
+    for (int i=0;i<n;++i) delete[] wt[i];
+    delete[] wt;
+    return 0;
+}
